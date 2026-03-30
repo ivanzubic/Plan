@@ -21,7 +21,7 @@ pygame.mixer.init()
 
 engine_sound = pygame.mixer.Sound("engine.wav")
 engine_sound.set_volume(0.3)
-engine_sound.play(1) 
+engine_sound.play(-1)
 
 # Igrač
 player = pygame.Rect(250, 500, 40, 70)
@@ -35,6 +35,8 @@ score = 0
 font = pygame.font.SysFont(None, 36)
 
 scroll_y = 0
+started = False
+engine_playing = False
 
 def draw():
     win.fill((34, 139, 34))
@@ -60,7 +62,7 @@ def draw():
     pygame.display.update()
 
 def main():
-    global scroll_y, score
+    global scroll_y, score, started, engine_playing
     run = True
 
     while run:
@@ -77,8 +79,13 @@ def main():
         if keys[pygame.K_RIGHT] and player.x < 360:
             player.x += speed
         if keys[pygame.K_UP]:
+            started = True
             scroll_y += 10
             score += 1
+            if not engine_playing:
+                engine_sound.play(-1)
+                engine_playing = True
+                
         if keys[pygame.K_DOWN]:
             scroll_y += 3
 
@@ -92,7 +99,8 @@ def main():
 
         # Kretanje
         for e in enemies[:]:
-            e.y += 6
+            if started:
+                e.y += 6
 
             if player.colliderect(e):
                 print("GAME OVER")
@@ -104,7 +112,7 @@ def main():
                 score += 5
 
         draw()
-
+ 
     pygame.quit()
 
 main()
